@@ -147,8 +147,8 @@ if ($dbOk) {
 $appUrl = rtrim($cfg['app_url'], '/');
 $gOk = !empty($cfg['google_client_id']) && strpos($cfg['google_client_id'], 'PASTE_') !== 0;
 $mOk = !empty($cfg['microsoft_client_id']) && strpos($cfg['microsoft_client_id'], 'PASTE_') !== 0;
-check('Google client ID/secret in config.php', $gOk, 'Get them from Ajula (or your own Google Cloud project).');
-check('Microsoft client ID/secret in config.php', $mOk, 'Get them from Abby (or your own Azure app registration).');
+check('Google client ID/secret in config.php', $gOk, 'Create your own OAuth client in Google Cloud (see README, "Keys and secrets").');
+check('Microsoft client ID/secret in config.php', $mOk, 'Create your own app registration in Azure (see README, "Keys and secrets").');
 $allOk = !in_array(false, array_column($checks, 1), true);
 ?>
 <!DOCTYPE html>

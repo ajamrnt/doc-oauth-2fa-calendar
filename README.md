@@ -40,10 +40,38 @@ Doctors have to use an authenticator app (Google Authenticator, Microsoft Authen
 
 1. Put the project in `/Applications/MAMP/htdocs/edoc` and start MAMP.
 2. Run `composer install` in the folder, then open `http://localhost:8888/edoc/setup.php`. It creates `config.php`, the database and the extra tables.
-3. Add the Google and Microsoft client ID / secret to `config.php`.
-4. Redirect URIs to register:
-   - Google: `http://localhost:8888/edoc/oauth-callback.php` (also enable Google Calendar API and add test users)
-   - Microsoft: `http://localhost:8888/edoc/microsoft-callback.php` (Web platform, with `offline_access` and `Calendars.ReadWrite`)
-5. Log in at `http://localhost:8888/edoc/login.php` (demo accounts: `patient@edoc.com`, `doctor@edoc.com`, `admin@edoc.com`, password `123`).
+3. Create your own Google and Microsoft keys and put them in `config.php` (see **Keys and secrets** below).
+4. Log in at `http://localhost:8888/edoc/login.php` (demo accounts: `patient@edoc.com`, `doctor@edoc.com`, `admin@edoc.com`, password `123`).
 
-`config.php` is in `.gitignore`, don't commit it.
+## Keys and secrets (bring your own)
+
+This repo has **no** API keys, client secrets or encryption keys in it. Everyone who runs it uses their own:
+
+| Key | Where it comes from | Where it goes |
+|---|---|---|
+| Encryption key (protects stored calendar tokens) | Made by `setup.php`, different for every install | `config.php` |
+| Google client ID + secret | Your own OAuth client in Google Cloud | `config.php` |
+| Microsoft client ID + secret | Your own app registration in Azure | `config.php` |
+| Database login | Your local MAMP / XAMPP | `config.php` |
+
+`config.php` is created from `config.example.php` (placeholders only) and is in `.gitignore`, so keys never get committed.
+Until you add the Google / Microsoft keys, those buttons show a "not available" message and email + password login still works.
+
+**Google**
+1. [console.cloud.google.com](https://console.cloud.google.com) → create a project.
+2. OAuth consent screen: External, and add your Google account as a test user.
+3. APIs & Services → Library → enable **Google Calendar API**.
+4. Credentials → Create credentials → OAuth client ID → **Web application**.
+   Authorised redirect URI: `http://localhost:8888/edoc/oauth-callback.php`
+5. Copy the client ID and secret into `google_client_id` / `google_client_secret`.
+
+**Microsoft**
+1. [portal.azure.com](https://portal.azure.com) → App registrations → New registration →
+   "Accounts in any organizational directory and personal Microsoft accounts".
+2. Redirect URI: platform **Web**, `http://localhost:8888/edoc/microsoft-callback.php`
+3. Certificates & secrets → New client secret → copy the **Value** (not the Secret ID).
+4. API permissions → Microsoft Graph → Delegated: `openid`, `profile`, `email`, `offline_access`, `User.Read`, `Calendars.ReadWrite`.
+5. Copy the Application (client) ID and the secret value into `microsoft_client_id` / `microsoft_client_secret`.
+
+Open `setup.php` again afterwards, it shows a tick when each provider is set up.
+If a key ever gets shared by mistake, delete it in Google Cloud / Azure and make a new one. Removing it from the code is not enough.
